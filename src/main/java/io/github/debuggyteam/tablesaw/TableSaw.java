@@ -1,14 +1,15 @@
 package io.github.debuggyteam.tablesaw;
 
-import net.minecraft.block.Material;
+import net.minecraft.block.Blocks;
+import net.minecraft.feature_flags.FeatureFlagBitSet;
 import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemGroup;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
@@ -29,8 +30,8 @@ public class TableSaw implements ModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger("TableSaw");
 
-    public static final TableSawBlock TABLESAW = new TableSawBlock(QuiltBlockSettings.of(Material.WOOD).nonOpaque());
-    public static final ScreenHandlerType<TableSawScreenHandler> TABLESAW_SCREEN_HANDLER = new ScreenHandlerType<>((syncId, inventory) -> new TableSawScreenHandler(syncId, inventory, ScreenHandlerContext.EMPTY));
+    public static final TableSawBlock TABLESAW = new TableSawBlock(QuiltBlockSettings.copyOf(Blocks.OAK_WOOD).nonOpaque());
+    public static final ScreenHandlerType<TableSawScreenHandler> TABLESAW_SCREEN_HANDLER = new ScreenHandlerType<>((syncId, inventory) -> new TableSawScreenHandler(syncId, inventory, ScreenHandlerContext.EMPTY), FeatureFlagBitSet.empty());
 
     /** Creates an identifier with this mod as the namespace */
     public static Identifier identifier(String path) {
@@ -40,12 +41,12 @@ public class TableSaw implements ModInitializer {
     @Override
     public void onInitialize(ModContainer mod) {
         LOGGER.info("Hello Quilt world from {}!", mod.metadata().name());
-
-        Registry.register(Registry.SCREEN_HANDLER, new Identifier(MODID, "tablesaw"), TABLESAW_SCREEN_HANDLER);
         
-        Registry.register(Registry.BLOCK, new Identifier(MODID, "tablesaw"), TABLESAW);
-        Registry.register(Registry.ITEM, new Identifier(MODID, "tablesaw"),
-                new BlockItem(TABLESAW, new QuiltItemSettings().group(ItemGroup.DECORATIONS)));
+        Registry.register(Registries.SCREEN_HANDLER_TYPE, new Identifier(MODID, "tablesaw"), TABLESAW_SCREEN_HANDLER);
+        
+        Registry.register(Registries.BLOCK, new Identifier(MODID, "tablesaw"), TABLESAW);
+        Registry.register(Registries.ITEM, new Identifier(MODID, "tablesaw"),
+                new BlockItem(TABLESAW, new QuiltItemSettings()));
         
         // Receives serverside notice that the tablesaw craft button is clicked
         ServerPlayNetworking.registerGlobalReceiver(TABLESAW_CHANNEL, new TableSawServerReceiver());
@@ -54,11 +55,12 @@ public class TableSaw implements ModInitializer {
         ResourceLoader.get(ResourceType.SERVER_DATA).registerReloader(new TableSawResourceLoader());
         
         // Syncs recipes for all connected players when a live reload happens
-        ResourceLoaderEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, error) -> {
+        //ResourceLoaderEvents.END_DATA_PACK_RELOAD.register((server, resourceManager, error) -> {
+        ResourceLoaderEvents.END_DATA_PACK_RELOAD.register((context) -> {
             // Server will be null here if this is the first reload as the game is starting. In that case there are no players to notify.
-            if (server == null) return;
-            for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                TableSawRecipeSync.syncFromServer(server, player);
+            if (context.server() == null) return;
+            for(ServerPlayerEntity player : context.server().getPlayerManager().getPlayerList()) {
+                TableSawRecipeSync.syncFromServer(context.server(), player);
             }
         });
         

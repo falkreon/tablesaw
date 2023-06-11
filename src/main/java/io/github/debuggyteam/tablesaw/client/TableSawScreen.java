@@ -5,18 +5,15 @@ import java.util.List;
 import org.quiltmc.qsl.networking.api.PacketByteBufs;
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import io.github.debuggyteam.tablesaw.TableSaw;
 import io.github.debuggyteam.tablesaw.TableSawRecipes;
 import io.github.debuggyteam.tablesaw.TableSawScreenHandler;
 import io.github.debuggyteam.tablesaw.api.TableSawRecipe;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
@@ -90,25 +87,25 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 	}
 
 	@Override
-	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		super.render(matrices, mouseX, mouseY, delta);
-		this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+	public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+		super.render(graphics, mouseX, mouseY, delta);
+		this.drawMouseoverTooltip(graphics, mouseX, mouseY);
 	}
 	
+	
 	@Override
-	protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-		this.renderBackground(matrices);
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		RenderSystem.setShaderTexture(0, TEXTURE);
-		this.drawTexture(matrices, x, y, 0, 0, this.backgroundWidth, this.backgroundHeight);
+	protected void drawBackground(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
+		this.renderBackground(graphics);
+		
+		graphics.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		graphics.drawTexture(TEXTURE, x, y, 0, 0, this.backgroundWidth, this.backgroundHeight);
 		
 		int scrollBarOffset = (int) ((SCROLLBAR_HEIGHT-SCROLLBAR_THUMB_HEIGHT) * this.scrollAmount);
 		int scrollThumbImageX = (shouldScroll()) ? SCROLLBAR_THUMB_X : DISABLED_SCROLLBAR_THUMB_X;
-		this.drawTexture(matrices, x + SCROLLBAR_X, y + SCROLLBAR_Y + scrollBarOffset, scrollThumbImageX, 0, SCROLLBAR_THUMB_WIDTH, SCROLLBAR_THUMB_HEIGHT);
+		graphics.drawTexture(TEXTURE, x + SCROLLBAR_X, y + SCROLLBAR_Y + scrollBarOffset, scrollThumbImageX, 0, SCROLLBAR_THUMB_WIDTH, SCROLLBAR_THUMB_HEIGHT);
 		
-		this.renderRecipeBackground(matrices, mouseX, mouseY, this.x + RECIPE_GRID_X, this.y + RECIPE_GRID_Y, this.scrollOffset);
-		this.renderRecipeIcons(x + RECIPE_GRID_X, y + RECIPE_GRID_Y, this.scrollOffset);
+		this.renderRecipeBackground(graphics, mouseX, mouseY, this.x + RECIPE_GRID_X, this.y + RECIPE_GRID_Y, this.scrollOffset);
+		this.renderRecipeIcons(graphics, x + RECIPE_GRID_X, y + RECIPE_GRID_Y, this.scrollOffset);
 		
 	}
 	
@@ -193,7 +190,7 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 		return true;
 	}
 	
-	private void renderRecipeBackground(MatrixStack matrices, int mouseX, int mouseY, int x, int y, int scrollOffset) {
+	private void renderRecipeBackground(GuiGraphics graphics, int mouseX, int mouseY, int x, int y, int scrollOffset) {
 		List<TableSawRecipe> list = getClientsideRecipes();
 		if (list.size()==0) return;
 		
@@ -215,7 +212,7 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 					}
 				}
 				
-				this.drawTexture(matrices, slotX, slotY, 0, imageY, RECIPE_SLOT_WIDTH, RECIPE_SLOT_HEIGHT);
+				graphics.drawTexture(TEXTURE, slotX, slotY, 0, imageY, RECIPE_SLOT_WIDTH, RECIPE_SLOT_HEIGHT);
 				
 				curSlot++;
 				if (curSlot >= list.size()) break loop;
@@ -223,7 +220,7 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 		}
 	}
 	
-	private void renderRecipeIcons(int x, int y, int scrollOffset) {
+	private void renderRecipeIcons(GuiGraphics graphics, int x, int y, int scrollOffset) {
 		List<TableSawRecipe> list = getClientsideRecipes();
 		if (list.size() == 0) return;
 		
@@ -234,7 +231,7 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 			for(int xi = 0; xi < 4; xi++) {
 				TableSawRecipe recipe = list.get(curSlot);
 				ItemStack stack = list.get(curSlot).getResult();
-				this.client.getItemRenderer().renderInGuiWithOverrides(stack, x + (xi * RECIPE_SLOT_WIDTH), y + (yi * RECIPE_SLOT_HEIGHT) + 2);
+				graphics.drawItemInSlot(this.textRenderer, stack, x + (xi * RECIPE_SLOT_WIDTH), y + (yi * RECIPE_SLOT_HEIGHT) + 2);
 				
 				String label = switch( TableSawClient.config.iconRatios ) {
 					case NONE -> "";
@@ -243,8 +240,7 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 					case OUTPUT_COUNT -> null; //(recipe.getResult().getCount() < 2) ? null : Integer.toString(recipe.getResult().getCount());
 				};
 				
-				
-				this.itemRenderer.renderGuiItemOverlay(this.textRenderer, stack, x + (xi * RECIPE_SLOT_WIDTH), y + (yi * RECIPE_SLOT_HEIGHT) + 2, label);
+				graphics.drawItemInSlot(this.textRenderer, stack, x + (xi * RECIPE_SLOT_WIDTH), y + (yi * RECIPE_SLOT_HEIGHT) + 2, label);
 				
 				curSlot++;
 				if (curSlot >= list.size()) break loop;
@@ -252,10 +248,10 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 		}
 
 	}
-
+	
 	@Override
-	protected void drawMouseoverTooltip(MatrixStack matrices, int x, int y) {
-		super.drawMouseoverTooltip(matrices, x, y);
+	protected void drawMouseoverTooltip(GuiGraphics graphics, int x, int y) {
+		super.drawMouseoverTooltip(graphics, x, y);
 		
 		int recipeX = this.x + RECIPE_GRID_X;
 		int recipeY = this.y + RECIPE_GRID_Y + 1;
@@ -273,7 +269,7 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 							ItemStack input = this.handler.input.getStack(0);
 							ItemStack output = list.get(hoveredSlot).getResult();
 							
-							List<Text> text = this.getTooltipFromItem(output);
+							List<Text> text = TableSawScreen.getTooltipFromItem(MinecraftClient.getInstance(), output);
 							
 							int sourceCount = list.get(hoveredSlot).getQuantity();
 							Text sourceName = Text.empty().append(input.getName()).formatted(input.getRarity().formatting);
@@ -282,9 +278,9 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 							MutableText recipeLine = Text.translatable("container.tablesaw.tablesaw.ratio", sourceCount, sourceName, output.getCount(), destName);
 							text.set(0, Text.empty().append(recipeLine));
 							
-							renderTooltip(matrices, text, x, y);
+							graphics.drawTooltip(this.textRenderer, text, x, y);
 						} else {
-							renderTooltip(matrices, list.get(hoveredSlot).getResult(), x, y);
+							graphics.drawTooltip(this.textRenderer, list.get(hoveredSlot).getResult(), x, y);
 						}
 						
 					}
@@ -311,6 +307,7 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 		
 		return baseScroll;
 	}
+
 	
 	
 }

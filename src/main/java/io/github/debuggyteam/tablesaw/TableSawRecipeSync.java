@@ -7,9 +7,9 @@ import org.quiltmc.qsl.networking.api.ServerPlayNetworking;
 
 import io.github.debuggyteam.tablesaw.api.TableSawRecipe;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.registry.Registry;
 
 public class TableSawRecipeSync {
 	/**
@@ -50,7 +50,7 @@ public class TableSawRecipeSync {
 	
 	/** Writes a recipe to a PacketByteBuf */
 	private static void writeRecipe(TableSawRecipe recipe, PacketByteBuf buf) {
-		String inputId = Registry.ITEM.getId(recipe.getInput()).toString();
+		String inputId = Registries.ITEM.getId(recipe.getInput()).toString();
 		buf.writeString(inputId);
 		buf.writeVarInt(recipe.getQuantity());
 		buf.writeItemStack(recipe.getResult());

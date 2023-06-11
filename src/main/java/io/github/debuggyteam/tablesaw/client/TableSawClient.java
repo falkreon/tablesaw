@@ -21,9 +21,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 import static io.github.debuggyteam.tablesaw.TableSaw.TABLESAW;
 
@@ -36,6 +37,7 @@ public class TableSawClient implements ClientModInitializer {
 		
 		config = QuiltConfig.create(TableSaw.MODID, "client", ClientSettings.class);
 		
+		//ScreenHandlerType<? extends M> type, HandledScreens.Provider<M, U> provider
 		
 		HandledScreens.register(TableSaw.TABLESAW_SCREEN_HANDLER, (TableSawScreenHandler gui, PlayerInventory inventory, Text title) -> new TableSawScreen(gui, inventory, title));
 		
@@ -65,7 +67,7 @@ public class TableSawClient implements ClientModInitializer {
 			
 			for(int i = 0; i < count; i++) {
 				String id = buf.readString();
-				Item inputItem = Registry.ITEM.get(new Identifier(id));
+				Item inputItem = Registries.ITEM.get(new Identifier(id));
 				int quantity = buf.readVarInt();
 				ItemStack result = buf.readItemStack();
 				

@@ -1,5 +1,7 @@
 package io.github.debuggyteam.tablesaw;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.StonecutterBlock;
@@ -16,8 +18,6 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-
-import javax.annotation.Nullable;
 
 public class TableSawBlock extends StonecutterBlock {
 	// Think of this as "minecraft:container/tablesaw:tablesaw"

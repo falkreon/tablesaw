@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.quiltmc.loader.api.QuiltLoader;
 import org.quiltmc.qsl.resource.loader.api.reloader.SimpleSynchronousResourceReloader;
 
@@ -27,10 +26,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 
 public class TableSawResourceLoader implements SimpleSynchronousResourceReloader {
 	public static final Identifier ID = TableSaw.identifier("recipe_loader");
@@ -139,7 +138,7 @@ public class TableSawResourceLoader implements SimpleSynchronousResourceReloader
 			count = 1;
 		}
 		
-		Item inputItem = Registry.ITEM.get(new Identifier(itemId));
+		Item inputItem = Registries.ITEM.get(new Identifier(itemId));
 		if (inputItem == Items.AIR) return null;
 		
 		ItemStack resultItemStack = ItemStack.EMPTY;
@@ -148,7 +147,7 @@ public class TableSawResourceLoader implements SimpleSynchronousResourceReloader
 		if (resultObject != null) {
 			String resultId = getString(resultObject, "item");
 			if (resultId == null) return null;
-			Item resultItem = Registry.ITEM.get(new Identifier(resultId));
+			Item resultItem = Registries.ITEM.get(new Identifier(resultId));
 			if (resultItem == Items.AIR) return null;
 			
 			Integer resultCount = getInteger(resultObject, "count");
@@ -169,7 +168,7 @@ public class TableSawResourceLoader implements SimpleSynchronousResourceReloader
 		} else {
 			String resultId = getString(obj, "result");
 			if (resultId == null) return null;
-			Item resultItem = Registry.ITEM.get(new Identifier(resultId));
+			Item resultItem = Registries.ITEM.get(new Identifier(resultId));
 			if (resultItem == Items.AIR) return null;
 			
 			resultItemStack = new ItemStack(resultItem);
