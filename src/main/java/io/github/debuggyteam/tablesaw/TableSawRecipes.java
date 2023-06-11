@@ -6,24 +6,24 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 
+import org.quiltmc.loader.api.minecraft.ClientOnly;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
 import io.github.debuggyteam.tablesaw.api.TableSawRecipe;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 
 public class TableSawRecipes {
 	
-	@Environment(EnvType.CLIENT)
+	@ClientOnly
 	private static TableSawRecipes CLIENT_INSTANCE = new TableSawRecipes();
 	private static TableSawRecipes SERVER_INSTANCE = new TableSawRecipes();
 	
-	@Environment(EnvType.CLIENT)
+	@ClientOnly
 	public static TableSawRecipes clientInstance() {
 		return CLIENT_INSTANCE;
 	}

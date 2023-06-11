@@ -231,7 +231,7 @@ public class TableSawScreen extends HandledScreen<TableSawScreenHandler> {
 			for(int xi = 0; xi < 4; xi++) {
 				TableSawRecipe recipe = list.get(curSlot);
 				ItemStack stack = list.get(curSlot).getResult();
-				graphics.drawItemInSlot(this.textRenderer, stack, x + (xi * RECIPE_SLOT_WIDTH), y + (yi * RECIPE_SLOT_HEIGHT) + 2);
+				graphics.drawItem(stack, x + (xi * RECIPE_SLOT_WIDTH), y + (yi * RECIPE_SLOT_HEIGHT) + 2);
 				
 				String label = switch( TableSawClient.config.iconRatios ) {
 					case NONE -> "";
