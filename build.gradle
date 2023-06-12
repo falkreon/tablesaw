@@ -1,7 +1,7 @@
 plugins {
 	id 'maven-publish'
 	id 'java'
-	//alias(libs.plugins.minotaur)
+	alias(libs.plugins.minotaur)
 	id "org.quiltmc.loom" version "1.+"
 }
 
@@ -68,7 +68,7 @@ publishing {
 	}
 }
 
-/*
+
 modrinth {
 	token = System.getenv("MODRINTH_TOKEN")
 	projectId = "tablesaw"
@@ -84,5 +84,5 @@ modrinth {
 	dependencies {
 		required.project "qsl"
 	}
-}*/
+}
 
